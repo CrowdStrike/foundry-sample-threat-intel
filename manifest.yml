@@ -1,0 +1,48 @@
+name: Threat Intelligence Detections Enrichment
+description: The Threat Intelligence Detections Enrichment app is a no-code sample application built on CrowdStrike's Foundry platform. It demonstrates how developers can enhance Falcon's endpoint detection capabilities by integrating additional threat intelligence data directly into the user interface.
+logo: docs/asset/logo.png
+vendor: ""
+vendor_products: []
+use_case: Threat intelligence
+manifest_version: ""
+ignored: []
+ui:
+  homepage: ""
+  extensions:
+    - name: Threat intelligence analysis
+      description: Malware and IOC information from Crowdswtrike APIs
+      path: ui/extensions/Threat intelligence analysis/Threat_intelligence_analysis.json
+      entrypoint: ""
+      sockets:
+        - activity.detections.details
+      content_security_policy:
+        connect-src: []
+        style-src: []
+        style-src-elem: []
+        script-src: []
+        form-action: []
+        img-src: []
+        media-src: []
+        object-src: []
+      permissions: []
+      is_ui_builder: true
+  pages: {}
+  dashboards: {}
+  navigation: {}
+api_integrations:
+  - name: Crowdstrike_Intelligence
+    description: ""
+    path: api-integrations/Crowdstrike_Intelligence.json
+rtr_scripts: []
+collections: []
+auth:
+  scopes: []
+  permissions: {}
+  roles: []
+functions: []
+workflows: []
+parsers: []
+logscale:
+  saved_searches: []
+lookup_files: []
+docs: {}
