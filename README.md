@@ -9,6 +9,9 @@ This app is one of several App Templates included in Foundry that you can use to
 preconfigured capabilities aligned to its business purpose. Deploy this app from the Templates page with a single click in the Foundry UI, or
 create an app from this template using the CLI.
 
+> [!IMPORTANT]  
+> To view the documentation links and deploy this app, you need access to the Falcon console.
+
 ## Description
 
 The Threat Intelligence Detections Enrichment app is a no-code sample application built on CrowdStrike's Foundry platform. It demonstrates how developers can enhance Falcon's endpoint detection capabilities by integrating additional threat intelligence data directly into the user interface.
@@ -78,11 +81,10 @@ foundry login
 
 Select the following permissions:
 
-- [ ] (optional) Run RTR Scripts
-- [ ] (optional) Run, execute, and test Workflows
-- [x] Run, execute, and test API integrations
-- [ ] (optional) Run, execute, and test LogScale queries
-- [ ] (optional) Generate mock data to test your app
+- [ ] Create and run RTR scripts
+- [ ] Create, execute and test workflow templates
+- [x] Create, run and view API integrations
+- [ ] Create, edit, delete, and list queries
 
 Deploy the app:
 
