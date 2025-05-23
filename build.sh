@@ -23,14 +23,14 @@ for i in {0..4}; do
     echo "Creating copy for $SUFFIX in dist directory"
     
     # Remove any existing copy directory
-    rm -rf "$COPY_DIR"
+    rm -rf "$COPY_DIR" 
     
     # Create a clean copy directory
     mkdir -p "$COPY_DIR"
     
     # Copy only visible files and directories, excluding .git and other hidden files
     echo "Copying files..."
-    rsync -a --exclude=".*" --exclude="dist" "$SOURCE_DIR/" "$COPY_DIR/"
+    rsync -a --exclude=".*" --exclude="dist" --exclude="build.sh" "$SOURCE_DIR/" "$COPY_DIR/"
     
     # Replace string in the target file using a safer approach
     if [ -f "$COPY_DIR/$TARGET_FILE" ]; then

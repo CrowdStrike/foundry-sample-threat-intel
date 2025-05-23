@@ -45,4 +45,6 @@ parsers: []
 logscale:
   saved_searches: []
 lookup_files: []
-docs: {}
+docs:
+  path: app_docs
+  entrypoint: README.md
