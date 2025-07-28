@@ -16,8 +16,6 @@ create an app from this template using the CLI.
 
 The Threat Intelligence Detections Enrichment app is a no-code sample application built on CrowdStrike's Foundry platform. It demonstrates how developers can enhance Falcon's endpoint detection capabilities by integrating additional threat intelligence data directly into the user interface.
 
-### Features
-
 - Integrates data from two Falcon API endpoints:
   - Malware API
   - Indicators of Compromise (IOC) API
@@ -25,20 +23,12 @@ The Threat Intelligence Detections Enrichment app is a no-code sample applicatio
 - Provides enriched threat intelligence without requiring users to navigate away
 - Built entirely using no-code capabilities in Foundry
 
-## Usage
+## Prerequisites
 
-You can install this app from the Foundry Templates page in your CrowdStrike Falcon instance or you can deploy it from this codebase using Foundry CLI.
+- The Foundry CLI (instructions below).
+- A valid Crowdstrike API key with the following scopes: Malware Analysis and IOCs
 
-### Deploying from the Foundry UI
-
-- Navigate to the Foundry Templates page in your CrowdStrike Falcon instance
-- Search for Threat Intelligence Detections Enrichment
-- Follow the on-screen prompts to complete installation
-- Provide a Crowdstrike API key, you can create one in Support and resources > API clients and keys (scopes: Malware Analysis and IOCs)
-
-### Deploying from the CLI
-
-#### Install the Foundry CLI
+### Install the Foundry CLI
 
 You can install the Foundry CLI with Scoop on Windows or Homebrew on Linux/macOS.
 
@@ -64,7 +54,7 @@ brew install crowdstrike/foundry-cli/foundry
 
 Run `foundry version` to verify it's installed correctly.
 
-##### Clone repo and deploy
+## Getting Started
 
 Clone this sample to your local system, or [download as a zip file](https://github.com/CrowdStrike/foundry-sample-threat-intel/archive/refs/heads/main.zip).
 
@@ -101,10 +91,48 @@ Once the deployment has finished, you can release the app:
 foundry apps release
 ```
 
-Next, go to **Foundry** > **App catalog**, find your app, and install it. Select the **Open App** button in the success dialog.
+Next, go to **Foundry** > **App catalog**, find your app, and install it. You will be requested to add the API credentials for the app, you can create them in Support and resources > API clients and keys.
 
 > [!TIP]
 > If the app doesn't load, reload the page.
+
+You can also install this app directly from the Foundry Templates page in your CrowdStrike Falcon instance:
+
+- Navigate to the Foundry Templates page in your CrowdStrike Falcon instance
+- Search for Threat Intelligence Detections Enrichment
+- Follow the on-screen prompts to complete installation
+- Provide a Crowdstrike API key, you can create one in Support and resources > API clients and keys
+
+## About this sample app
+
+The Threat Intelligence Detections Enrichment app demonstrates how to leverage Foundry to enhance endpoint detection capabilities with additional threat intelligence data.
+
+### Architecture and Components
+
+The application consists of several integrated components working together:
+
+1. **UI Extensions**:
+
+   - Custom widget that integrates into the endpoint detections screen
+   - Provides an interface for viewing enriched threat intelligence data
+
+2. **API Integrations**:
+   - `Crowdstrike_Intelligence.json` - Connects to Falcon's Malware and IOC APIs to retrieve threat intelligence data
+
+### How It Works
+
+1. **Threat Intelligence Enrichment**:
+
+   - When viewing endpoint detections, the extension loads additional threat intelligence data
+   - The app fetches data from both the Malware API and IOC API
+   - The information is presented directly in the detection interface, eliminating the need for users to navigate to separate screens
+   - This enrichment provides security analysts with more context about potential threats
+
+2. **No-Code Implementation**:
+   - The entire app is built using Foundry's no-code capabilities
+   - Demonstrates how powerful integrations can be created without traditional programming
+
+This sample demonstrates several Foundry capabilities, including UI extensions that integrate directly into existing Falcon interfaces and seamless API integrations with the Falcon platform. Together, these components create a cohesive application that enhances security operations by providing enriched threat intelligence data directly within the detection workflow.
 
 ## Foundry resources
 
