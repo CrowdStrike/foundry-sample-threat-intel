@@ -1,10 +1,10 @@
-![CrowdStrike Falcon](/images/cs-logo.png?raw=true)
+![CrowdStrike Falcon](/docs/asset/cs-logo.png?raw=true)
 
 [![CrowdStrike Subreddit](https://img.shields.io/badge/-r%2Fcrowdstrike-white?logo=reddit&labelColor=gray&link=https%3A%2F%2Freddit.com%2Fr%2Fcrowdstrike)](https://reddit.com/r/crowdstrike)
 
 # Contributing to this repository
 
-![Hollywood Adversaries](/images/hollywood-adversaries.jpg?raw=true)
+![Hollywood Adversaries](/docs/asset/hollywood-adversaries.jpg?raw=true)
 
 Please review this document for details regarding getting started with your first contribution, packages you'll need to install as a developer, and our Pull Request process. If you have any questions, please let us know by posting your question as an [issue](https://github.com/CrowdStrike/foundry-sample-threat-intel/issues).
 
@@ -71,5 +71,5 @@ remove things that do not respect it.
 
 ---
 
-<p align="center"><img src="/images/cs-logo-footer.png"><br/><img width="300px" src="/images/turbine-panda.png"></p>
+<p align="center"><img src="/docs/asset/cs-logo-footer.png"><br/><img width="300px" src="/docs/asset/turbine-panda.png"></p>
 <h3><p align="center">WE STOP BREACHES</p></h3>
