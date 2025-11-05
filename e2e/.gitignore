@@ -1,0 +1,21 @@
+# Environment variables
+.env
+.env.keys
+
+# Test results
+test-results/
+playwright-report/
+
+# Dependencies
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store
+
+# Playwright
+playwright/.cache/
+playwright/.auth/
