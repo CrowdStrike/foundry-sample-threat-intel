@@ -77,7 +77,7 @@ export class AppCatalogPage extends BasePage {
    * Install app if not already installed
    */
   async installApp(appName: string): Promise<boolean> {
-    this.logger.step(`Install app via UI`);
+    this.logger.step(`Install app '${appName}'`);
 
     const isInstalled = await this.isAppInstalled(appName);
     if (isInstalled) {
@@ -99,6 +99,9 @@ export class AppCatalogPage extends BasePage {
 
     // Handle permissions dialog
     await this.handlePermissionsDialog();
+
+    // Check for ServiceNow configuration screen
+    await this.configureServiceNowIfNeeded();
 
     // Click final Install app button
     await this.clickInstallAppButton();
@@ -124,91 +127,69 @@ export class AppCatalogPage extends BasePage {
   }
 
   /**
-   * Click the final "Install app" button
+   * Configure ServiceNow API integration if configuration form is present
    */
-  private async clickInstallAppButton(): Promise<void> {
-    // Check if there's a configuration form that needs to be filled
+  private async configureServiceNowIfNeeded(): Promise<void> {
+    this.logger.info('Checking if ServiceNow API configuration is required...');
+
+    // Check if there are text input fields (configuration form)
     const textInputs = this.page.locator('input[type="text"]');
-    const hasConfigForm = await textInputs.count() > 0;
 
-    if (hasConfigForm) {
-      this.logger.info('API configuration form detected - filling Falcon API credentials');
-
-      // Verify environment variables are set
-      const falconClientId = process.env.FALCON_CLIENT_ID;
-      const falconClientSecret = process.env.FALCON_CLIENT_SECRET;
-
-      if (!falconClientId || !falconClientSecret) {
-        throw new Error(
-          'FALCON_CLIENT_ID and FALCON_CLIENT_SECRET environment variables must be set for API configuration.\n' +
-          'Please create an API client at: https://falcon.us-2.crowdstrike.com/api-clients-and-keys/clients\n' +
-          'Required scopes: Malware Analysis (malquery:read), IOCs - Indicators of Compromise (iocs:read)'
-        );
-      }
-
-      if (falconClientId.trim() === '' || falconClientSecret.trim() === '') {
-        throw new Error('FALCON_CLIENT_ID and FALCON_CLIENT_SECRET environment variables cannot be blank');
-      }
-
-      // Fill in configuration fields
-      const nameField = textInputs.nth(0);
-      await nameField.fill('CrowdStrike Intelligence API');
-      this.logger.debug('Filled Name field');
-
-      // Infer API base URL from FALCON_BASE_URL
-      const falconBaseUrl = process.env.FALCON_BASE_URL || 'https://falcon.us-2.crowdstrike.com';
-      const apiBaseUrl = falconBaseUrl.replace('falcon.', 'api.');
-
-      const baseUrlField = textInputs.nth(1);
-      await baseUrlField.fill(apiBaseUrl);
-      this.logger.debug(`Filled BaseURL field with ${apiBaseUrl}`);
-
-      const clientIdField = textInputs.nth(2);
-      await clientIdField.fill(falconClientId);
-      this.logger.debug('Filled Client ID field');
-
-      // Client secret field is type="password", not type="text"
-      const clientSecretField = this.page.locator('input[type="password"]').first();
-      await clientSecretField.fill(falconClientSecret);
-      this.logger.debug('Filled Client secret field');
-
-      // Fill permissions field - multiselect combobox
-      // Required scopes for threat intel: malquery:read (Malware Analysis) and iocs:read (Indicators of Compromise)
-      const permissions = ['malquery:read', 'iocs:read'];
-
-      for (const permission of permissions) {
-        // Dispatch events to open the dropdown
-        await this.page.evaluate(() => {
-          const input = document.querySelector('[data-test-selector="form-multiselect"] input[data-test-selector="input"]') as HTMLInputElement;
-          if (input) {
-            input.focus();
-            input.dispatchEvent(new FocusEvent('focus', { bubbles: true }));
-            input.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }));
-            input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown', code: 'ArrowDown', bubbles: true }));
-          }
-        });
-
-        // Wait for dropdown to open and option to appear
-        const option = this.page.getByRole('option', { name: permission });
-        await option.waitFor({ state: 'visible', timeout: 10000 });
-        await option.click();
-
-        this.logger.debug(`Selected permission: ${permission}`);
-      }
-
-      this.logger.debug('Filled Permissions field with required API scopes');
-
-      // Wait for form to settle
-      await this.page.waitForLoadState('networkidle');
+    try {
+      await textInputs.first().waitFor({ state: 'visible', timeout: 15000 });
+      const count = await textInputs.count();
+      this.logger.info(`ServiceNow configuration form detected with ${count} input fields`);
+    } catch (error) {
+      this.logger.info('No ServiceNow configuration required - no input fields found');
+      return;
     }
 
-    const installButton = this.page.getByRole('button', { name: 'Install app' });
-    await this.waiter.waitForVisible(installButton, { description: 'Install app button' });
+    this.logger.info('ServiceNow configuration required, filling dummy values');
 
-    // Button should now be enabled after filling all required fields
-    await this.smartClick(installButton, 'Install app button');
+    // Fill configuration fields using index-based selection
+    // Field 1: Name
+    const nameField = this.page.locator('input[type="text"]').first();
+    await nameField.fill('ServiceNow Test Instance');
+    this.logger.debug('Filled Name field');
 
-    this.logger.info('Clicked Install app button');
+    // Field 2: Instance (the {instance} part of {instance}.service-now.com)
+    const instanceField = this.page.locator('input[type="text"]').nth(1);
+    await instanceField.fill('dev12345');
+    this.logger.debug('Filled Instance field');
+
+    // Field 3: Username
+    const usernameField = this.page.locator('input[type="text"]').nth(2);
+    await usernameField.fill('dummy_user');
+    this.logger.debug('Filled Username field');
+
+    // Field 4: Password (must be >8 characters)
+    const passwordField = this.page.locator('input[type="password"]').first();
+    await passwordField.fill('DummyPassword123');
+    this.logger.debug('Filled Password field');
+
+    // Wait for network to settle after filling form
+    await this.page.waitForLoadState('networkidle');
+
+    this.logger.success('ServiceNow API configuration completed');
+  }
+
+  /**
+   * Click the final "Save and install" button
+   */
+  private async clickInstallAppButton(): Promise<void> {
+    const installButton = this.page.getByRole('button', { name: 'Save and install' });
+
+    await this.waiter.waitForVisible(installButton, { description: 'Save and install button' });
+
+    // Wait for button to be enabled
+    await installButton.waitFor({ state: 'visible', timeout: 10000 });
+    await installButton.waitFor({ state: 'attached', timeout: 5000 });
+
+    // Simple delay for form to enable button
+    await this.waiter.delay(1000);
+
+    await this.smartClick(installButton, 'Save and install button');
+    this.logger.info('Clicked Save and install button');
   }
 
   /**
@@ -289,9 +270,8 @@ export class AppCatalogPage extends BasePage {
         return;
       }
 
-      // Click the 3-dot menu button (the one at the top of the app details page, not in catalog list)
-      // Use .first() to get the first visible menu button on the app details page
-      const openMenuButton = this.page.getByRole('button', { name: 'Open menu' }).first();
+      // Click the 3-dot menu button
+      const openMenuButton = this.page.getByRole('button', { name: 'Open menu' });
       await this.waiter.waitForVisible(openMenuButton, { description: 'Open menu button' });
       await this.smartClick(openMenuButton, 'Open menu button');
 
