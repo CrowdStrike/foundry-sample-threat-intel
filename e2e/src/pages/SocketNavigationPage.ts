@@ -37,7 +37,7 @@ export class SocketNavigationPage extends BasePage {
         await this.page.waitForLoadState('networkidle');
 
         // Open the hamburger menu
-        const menuButton = this.page.getByRole('button', { name: 'Menu' });
+        const menuButton = this.page.getByTestId('nav-trigger');
         await menuButton.click();
         await this.page.waitForLoadState('networkidle');
 
@@ -89,7 +89,7 @@ export class SocketNavigationPage extends BasePage {
         await this.page.waitForLoadState('networkidle');
 
         // Open the hamburger menu
-        const menuButton = this.page.getByRole('button', { name: 'Menu' });
+        const menuButton = this.page.getByTestId('nav-trigger');
         await menuButton.click();
         await this.page.waitForLoadState('networkidle');
 
@@ -127,7 +127,7 @@ export class SocketNavigationPage extends BasePage {
         await this.page.waitForLoadState('networkidle');
 
         // Open the hamburger menu
-        const menuButton = this.page.getByRole('button', { name: 'Menu' });
+        const menuButton = this.page.getByTestId('nav-trigger');
         await menuButton.click();
         await this.page.waitForLoadState('networkidle');
 
