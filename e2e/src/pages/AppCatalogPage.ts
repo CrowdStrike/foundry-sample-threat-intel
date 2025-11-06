@@ -128,14 +128,10 @@ export class AppCatalogPage extends BasePage {
 
   /**
    * Configure API integration if configuration form is present during installation.
-   * 
-   * NOTE: This method currently handles ServiceNow-specific fields but is designed as
-   * a no-op for apps without API integrations. This common pattern across all sample apps
-   * will be extracted to the future @crowdstrike/foundry-e2e-testing framework.
-   * 
-   * Apps with ServiceNow configuration: servicenow-itsm, servicenow-idp
-   * Other apps: Returns early when no configuration fields detected
-   * 
+   *
+   * This method handles Falcon API credentials with Permissions combobox.
+   * The Threat Intel app requires: Malware Analysis (read) and IOCs (read) permissions.
+   *
    * @future-framework-extraction Candidate for BasePage or AppCatalogPage in shared framework
    */
   private async configureApiIntegrationIfNeeded(): Promise<void> {
@@ -147,39 +143,95 @@ export class AppCatalogPage extends BasePage {
     try {
       await textInputs.first().waitFor({ state: 'visible', timeout: 15000 });
       const count = await textInputs.count();
-      this.logger.info(`ServiceNow configuration form detected with ${count} input fields`);
+      this.logger.info(`API integration configuration form detected with ${count} input fields`);
     } catch (error) {
-      this.logger.info('No ServiceNow configuration required - no input fields found');
+      this.logger.info('No API integration configuration required - no input fields found');
       return;
     }
 
-    this.logger.info('ServiceNow configuration required, filling dummy values');
+    this.logger.info('API integration configuration required, filling Falcon API values');
+
+    // Calculate API base URL from Falcon base URL
+    const falconBaseUrl = process.env.FALCON_BASE_URL || 'https://falcon.us-2.crowdstrike.com';
+    const apiBaseUrl = falconBaseUrl.replace('falcon', 'api');
+
+    const clientId = process.env.FALCON_CLIENT_ID || '';
+    const clientSecret = process.env.FALCON_CLIENT_SECRET || '';
 
     // Fill configuration fields using index-based selection
     // Field 1: Name
     const nameField = this.page.locator('input[type="text"]').first();
-    await nameField.fill('ServiceNow Test Instance');
+    await nameField.fill('Falcon API');
     this.logger.debug('Filled Name field');
 
-    // Field 2: Instance (the {instance} part of {instance}.service-now.com)
-    const instanceField = this.page.locator('input[type="text"]').nth(1);
-    await instanceField.fill('dev12345');
-    this.logger.debug('Filled Instance field');
+    // Field 2: BaseURL
+    const baseUrlField = this.page.locator('input[type="text"]').nth(1);
+    await baseUrlField.fill(apiBaseUrl);
+    this.logger.debug(`Filled BaseURL field: ${apiBaseUrl}`);
 
-    // Field 3: Username
-    const usernameField = this.page.locator('input[type="text"]').nth(2);
-    await usernameField.fill('dummy_user');
-    this.logger.debug('Filled Username field');
+    // Field 3: Client ID
+    const clientIdField = this.page.locator('input[type="text"]').nth(2);
+    await clientIdField.fill(clientId);
+    this.logger.debug('Filled Client ID field');
 
-    // Field 4: Password (must be >8 characters)
-    const passwordField = this.page.locator('input[type="password"]').first();
-    await passwordField.fill('DummyPassword123');
-    this.logger.debug('Filled Password field');
+    // Field 4: Client secret (password field)
+    const clientSecretField = this.page.locator('input[type="password"]').first();
+    await clientSecretField.fill(clientSecret);
+    this.logger.debug('Filled Client secret field');
+
+    // Field 5: Permissions (combobox - select required permissions)
+    const permissionsCombobox = this.page.getByRole('combobox', { name: /Permissions/i });
+    if (await this.elementExists(permissionsCombobox, 2000)) {
+      // Check if permissions are already selected (from a previous failed install)
+      const selectedText = await permissionsCombobox.inputValue().catch(() => '');
+
+      // Threat intel app requires: Malware Analysis (read) and IOCs (read)
+      const hasMalwareAnalysis = selectedText.includes('malware-analysis:read');
+      const hasIOCs = selectedText.includes('iocs:read');
+
+      if (hasMalwareAnalysis && hasIOCs) {
+        this.logger.debug('Permissions already selected (malware-analysis:read, iocs:read)');
+      } else {
+        // Need to select permissions
+        await permissionsCombobox.click();
+        await this.waiter.delay(500);
+        this.logger.debug('Opened Permissions combobox');
+
+        // Wait for listbox to appear
+        const listbox = this.page.getByRole('listbox');
+        await listbox.waitFor({ state: 'visible', timeout: 5000 });
+
+        if (!hasMalwareAnalysis) {
+          // Select malware-analysis:read - wait for it and click
+          const malwareAnalysisOption = this.page.getByRole('option').filter({ hasText: 'malware-analysis:read' });
+          if (await this.elementExists(malwareAnalysisOption, 2000)) {
+            await malwareAnalysisOption.click();
+            await this.waiter.delay(300);
+            this.logger.debug('Selected malware-analysis:read permission');
+          }
+        }
+
+        if (!hasIOCs) {
+          // Select iocs:read - wait for it and click
+          const iocsReadOption = this.page.getByRole('option').filter({ hasText: 'iocs:read' });
+          if (await this.elementExists(iocsReadOption, 2000)) {
+            await iocsReadOption.click();
+            await this.waiter.delay(300);
+            this.logger.debug('Selected iocs:read permission');
+          }
+        }
+
+        // Click outside to close the dropdown
+        await this.page.keyboard.press('Escape');
+        await this.waiter.delay(500);
+        this.logger.debug('Closed Permissions combobox');
+      }
+    }
 
     // Wait for network to settle after filling form
     await this.page.waitForLoadState('networkidle');
 
-    this.logger.success('ServiceNow API configuration completed');
+    this.logger.success('Falcon API configuration completed');
   }
 
   /**
