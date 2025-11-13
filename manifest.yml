@@ -5,7 +5,9 @@ vendor: ""
 vendor_products: []
 use_case: Threat intelligence
 manifest_version: ""
-ignored: []
+ignored:
+  - e2e
+  - e2e/.+
 ui:
   homepage: ""
   extensions:

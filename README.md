@@ -134,6 +134,45 @@ The application consists of several integrated components working together:
 
 This sample demonstrates several Foundry capabilities, including UI extensions that integrate directly into existing Falcon interfaces and seamless API integrations with the Falcon platform. Together, these components create a cohesive application that enhances security operations by providing enriched threat intelligence data directly within the detection workflow.
 
+## End-to-End Testing
+
+This project includes comprehensive Playwright-based E2E tests that verify the threat intelligence extension renders correctly and displays data from the Malware and IOC APIs.
+
+### Running E2E Tests Locally
+
+1. Navigate to the e2e directory:
+   ```bash
+   cd e2e
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   npx playwright install chromium
+   ```
+
+3. Configure your environment:
+   ```bash
+   cp .env.sample .env
+   # Edit .env with your Falcon credentials
+   ```
+
+4. Run the tests:
+   ```bash
+   npm test
+   ```
+
+For detailed information about the E2E tests, see [e2e/README.md](e2e/README.md).
+
+### CI/CD
+
+E2E tests run automatically on:
+- Push to main branch
+- Pull requests
+- Manual workflow dispatch
+
+Tests verify the extension renders in detection details and displays threat intelligence data.
+
 ## Foundry resources
 
 - Foundry documentation: [US-1](https://falcon.crowdstrike.com/documentation/category/c3d64B8e/falcon-foundry) | [US-2](https://falcon.us-2.crowdstrike.com/documentation/category/c3d64B8e/falcon-foundry) | [EU](https://falcon.eu-1.crowdstrike.com/documentation/category/c3d64B8e/falcon-foundry)
