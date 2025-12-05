@@ -42,7 +42,8 @@ export class SocketNavigationPage extends BasePage {
         await this.page.waitForLoadState('networkidle');
 
         // Click "Endpoint security"
-        const endpointSecurityButton = this.page.getByRole('button', { name: /Endpoint security/i });
+        const navigation = this.page.getByRole('navigation');
+        const endpointSecurityButton = navigation.getByRole('button', { name: /Endpoint security/ });
         await endpointSecurityButton.click();
         await this.waiter.delay(500);
 
