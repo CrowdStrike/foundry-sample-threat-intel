@@ -108,9 +108,10 @@ export class ThreatIntelExtensionPage extends SocketNavigationPage {
     const falconClientSecret = process.env.FALCON_CLIENT_SECRET;
 
     if (!falconClientId || !falconClientSecret) {
+      const falconBaseUrl = process.env.FALCON_BASE_URL || 'https://falcon.crowdstrike.com';
       throw new Error(
         'FALCON_CLIENT_ID and FALCON_CLIENT_SECRET environment variables must be set for API configuration.\n' +
-        'Please create an API client at: https://falcon.us-2.crowdstrike.com/api-clients-and-keys/clients\n' +
+        `Please create an API client at: ${falconBaseUrl}/api-clients-and-keys/clients\n` +
         'Required scopes: Malware Analysis (malquery:read), IOCs - Indicators of Compromise (iocs:read)'
       );
     }
