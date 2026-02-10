@@ -2,7 +2,7 @@
  * AppCatalogPage - App installation and management
  */
 
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 import { BasePage } from './BasePage';
 import { RetryHandler } from '../utils/SmartWaiter';
 import { config } from '../config/TestConfig';
@@ -333,38 +333,50 @@ export class AppCatalogPage extends BasePage {
   }
 
   /**
-   * Navigate to app via Custom Apps menu
+   * Navigate to app via Custom Apps menu.
+   * Uses 5-attempt retry with page refresh to handle platform flakiness
+   * where Custom Apps button doesn't appear on first load.
    */
   async navigateToAppViaCustomApps(appName: string): Promise<void> {
     this.logger.step(`Navigate to app '${appName}' via Custom Apps`);
 
-    return RetryHandler.withPlaywrightRetry(
-      async () => {
-        // Navigate to Foundry home
-        await this.navigateToPath('/foundry/home', 'Foundry home page');
+    await this.navigateToPath('/foundry/home', 'Foundry home page');
+    await this.page.waitForLoadState('networkidle');
 
-        // Open hamburger menu
-        const menuButton = this.page.getByTestId('nav-trigger');
-        await this.smartClick(menuButton, 'Menu button');
+    // Retry with page refresh if Custom apps menu doesn't appear
+    let customAppsFound = false;
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      const menuButton = this.page.getByTestId('nav-trigger');
+      await menuButton.waitFor({ state: 'visible', timeout: 30000 });
+      await menuButton.click();
+      await this.page.waitForLoadState('networkidle');
 
-        // Click Custom apps
-        const customAppsButton = this.page.getByRole('button', { name: 'Custom apps' });
-        await this.smartClick(customAppsButton, 'Custom apps button');
+      const customAppsButton = this.page.getByRole('button', { name: 'Custom apps' });
+      try {
+        await customAppsButton.waitFor({ state: 'visible', timeout: 20000 });
+        await customAppsButton.click();
+        await this.waiter.delay(1500);
+        customAppsFound = true;
+        this.logger.info(`Custom apps button found on attempt ${attempt}`);
+        break;
+      } catch (e) {
+        this.logger.warn(`Custom apps not visible on attempt ${attempt}, refreshing page...`);
+        await this.page.reload();
+        await this.page.waitForLoadState('networkidle');
+        await this.waiter.delay(3000);
+      }
+    }
+    if (!customAppsFound) {
+      throw new Error('Custom apps button not found after 5 attempts with page refresh');
+    }
 
-        // Find and click the app
-        const appButton = this.page.getByRole('button', { name: appName, exact: false }).first();
-        if (await this.elementExists(appButton, 3000)) {
-          await this.smartClick(appButton, `App '${appName}' button`);
-          await this.waiter.delay(1000);
+    // Find and click the app
+    const appButton = this.page.getByRole('button', { name: appName, exact: false }).first();
+    await expect(appButton).toBeVisible({ timeout: 20000 });
+    await appButton.click();
+    await this.waiter.delay(1000);
 
-          this.logger.success(`Navigated to app '${appName}' via Custom Apps`);
-          return;
-        }
-
-        throw new Error(`App '${appName}' not found in Custom Apps menu`);
-      },
-      `Navigate to app via Custom Apps`
-    );
+    this.logger.success(`Navigated to app '${appName}' via Custom Apps`);
   }
 
   /**
