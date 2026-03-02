@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    ignore:
+      - dependency-name: "actions/checkout"
+        versions: [">=6.0.2"]
+      - dependency-name: "actions/setup-node"
+        versions: [">=6.2.0"]
+      - dependency-name: "actions/upload-artifact"
+        versions: [">=6.0.0"]
