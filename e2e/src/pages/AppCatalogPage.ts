@@ -145,8 +145,7 @@ export class AppCatalogPage extends BasePage {
       const count = await textInputs.count();
       this.logger.info(`API integration configuration form detected with ${count} input fields`);
     } catch (error) {
-      this.logger.info('No API integration configuration required - no input fields found');
-      return;
+      throw new Error('This app should prompt for API credentials');
     }
 
     this.logger.info('API integration configuration required, filling Falcon API values');
