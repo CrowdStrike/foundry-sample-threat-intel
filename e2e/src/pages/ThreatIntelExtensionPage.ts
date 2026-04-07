@@ -59,7 +59,7 @@ export class ThreatIntelExtensionPage extends SocketNavigationPage {
         }
 
         // Verify iframe loads
-        await expect(this.page.locator('iframe')).toBeVisible({ timeout: 15000 });
+        await expect(this.page.locator('iframe').first()).toBeVisible({ timeout: 15000 });
         this.logger.info('Extension iframe loaded');
 
         // Check if API configuration is needed (first time setup)
