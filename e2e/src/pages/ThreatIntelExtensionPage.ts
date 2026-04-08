@@ -59,14 +59,14 @@ export class ThreatIntelExtensionPage extends SocketNavigationPage {
         }
 
         // Verify iframe loads
-        await expect(this.page.locator('iframe')).toBeVisible({ timeout: 15000 });
+        await expect(this.page.locator('iframe[name="portal"]')).toBeVisible({ timeout: 15000 });
         this.logger.info('Extension iframe loaded');
 
         // Check if API configuration is needed (first time setup)
         await this.configureAPIIfNeeded();
 
         // Verify iframe content
-        const iframe: FrameLocator = this.page.frameLocator('iframe');
+        const iframe: FrameLocator = this.page.frameLocator('iframe[name="portal"]');
 
         // Check for File malware metadata section
         const malwareSection = iframe.getByText(/File malware metadata/i);
@@ -90,7 +90,7 @@ export class ThreatIntelExtensionPage extends SocketNavigationPage {
   private async configureAPIIfNeeded(): Promise<void> {
     this.logger.info('Checking if API configuration is required...');
 
-    const iframe: FrameLocator = this.page.frameLocator('iframe');
+    const iframe: FrameLocator = this.page.frameLocator('iframe[name="portal"]');
 
     // Check if there are input fields (indicating API configuration is needed)
     const inputFields = iframe.locator('input[type="text"]');
@@ -148,7 +148,7 @@ export class ThreatIntelExtensionPage extends SocketNavigationPage {
     for (const permission of permissions) {
       // Dispatch events to open the dropdown
       await this.page.evaluate(() => {
-        const iframe = document.querySelector('iframe') as HTMLIFrameElement;
+        const iframe = document.querySelector('iframe[name="portal"]') as HTMLIFrameElement;
         if (iframe && iframe.contentDocument) {
           const input = iframe.contentDocument.querySelector('[data-test-selector="form-multiselect"] input[data-test-selector="input"]') as HTMLInputElement;
           if (input) {
