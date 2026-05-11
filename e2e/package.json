@@ -1,25 +1,19 @@
 {
   "name": "playwright-foundry-threat-intel",
   "version": "1.0.0",
-  "description": "Playwright e2e tests to ensure threat intel extension installs and renders properly",
+  "description": "Playwright e2e tests for Threat Intel extension",
   "scripts": {
     "test": "npx playwright test",
     "test:ui": "npx playwright test --ui",
-    "test:debug": "npx playwright test --debug",
-    "test:verbose": "DEBUG=true npx playwright test --reporter=list"
+    "test:debug": "npx playwright test --debug"
   },
-  "keywords": [],
   "license": "MIT",
   "type": "commonjs",
   "engines": {
     "node": ">=22.0.0"
   },
-  "dependencies": {
-    "@dotenvx/dotenvx": "1.52.0",
-    "otpauth": "9.5.0"
-  },
   "devDependencies": {
-    "@playwright/test": "1.57.0",
+    "@crowdstrike/foundry-playwright": "0.5.0",
     "@types/node": "25.1.0"
   }
 }
