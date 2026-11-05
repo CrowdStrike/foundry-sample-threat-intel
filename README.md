@@ -26,6 +26,7 @@ The Threat Intelligence Detections Enrichment app is a no-code sample applicatio
 ## Prerequisites
 
 - The Foundry CLI (instructions below).
+- [pre-commit](https://pre-commit.com/) for secret scanning
 - A valid Crowdstrike API key with the following scopes: Malware Analysis and IOCs
 
 ### Install the Foundry CLI
@@ -61,6 +62,13 @@ Clone this sample to your local system, or [download as a zip file](https://gith
 ```shell
 git clone https://github.com/CrowdStrike/foundry-sample-threat-intel
 cd foundry-sample-threat-intel
+```
+
+Set up secret scanning:
+
+```shell
+pip install pre-commit
+pre-commit install
 ```
 
 Log in to Foundry:
@@ -172,6 +180,35 @@ E2E tests run automatically on:
 - Manual workflow dispatch
 
 Tests verify the extension renders in detection details and displays threat intelligence data.
+
+## Secret Scanning
+
+This repository enforces secret scanning on every commit via the [pre-commit](https://pre-commit.com/) framework using [betterleaks](https://github.com/betterleaks/betterleaks), a tool that detects secrets and credentials in source code before they are committed.
+
+### Setup
+
+```bash
+# Install pre-commit (run once)
+brew install pre-commit
+
+# Register the git hook (run once after cloning)
+pre-commit install
+```
+
+### How it works
+
+On each `git commit`, betterleaks scans all staged files for secrets and credentials.
+
+| Scenario | Result |
+|----------|--------|
+| Secret detected in staged files | Commit blocked |
+| No secrets found | Commit allowed |
+| pre-commit not installed | No hook runs (secrets not scanned) |
+
+**Bypass (false positives only):**
+```bash
+git commit --no-verify
+```
 
 ## Foundry resources
 
